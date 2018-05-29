@@ -33,3 +33,23 @@ class Sql:
             result = cursor.fetchone()
             a = [value for value in result.values()]
             return a[0]
+
+    @classmethod
+    def insert_dd_chatername(cls, chapter_name, content, novel_id, num, url):
+        with connection.cursor() as cursor:
+            sql = 'INSERT INTO dd_chaptername(`chapter_name`, `content`, `novel_id`, `num`, `url`) \
+                VALUES (%s, %s, %s, %s, %s)'
+            cursor.execute(sql, (chapter_name, content, novel_id, num, url))
+        connection.commit()
+
+    @classmethod
+    def select_chapter(cls, url):
+        with connection.cursor() as cursor:
+            sql = 'SELECT EXISTS(SELECT 1 FROM dd_chaptername WHERE url = %s)'
+            cursor.execute(sql, (url, ))
+            result = cursor.fetchone()
+            a = [value for value in result.values()]
+            return a[0]
+
+        
+        

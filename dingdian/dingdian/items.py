@@ -18,4 +18,11 @@ class DingdianItem(scrapy.Item):
     serial_length = scrapy.Field()
     category = scrapy.Field()
     
+
+class ContentItem(scrapy.Item):
+    novel_id = scrapy.Field()
+    chapter_content = scrapy.Field()
+    num = scrapy.Field()
+    chapter_url = scrapy.Field()
+    chapter_name = scrapy.Field()
     

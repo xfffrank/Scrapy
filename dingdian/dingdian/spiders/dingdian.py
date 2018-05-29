@@ -1,7 +1,8 @@
 import re, scrapy
 from bs4 import BeautifulSoup
 from scrapy.http import Request
-from dingdian.items import DingdianItem
+from dingdian.items import DingdianItem, ContentItem
+from dingdian.mysql_pipelines.sql import Sql
 
 class Myspider(scrapy.Spider):
     name = 'dingdian'
@@ -44,8 +45,42 @@ class Myspider(scrapy.Spider):
         item['novel_id'] = bs.find('p', class_='btnlinks').find('a', class_='read')['href'][-6:-1].replace('/', '')
         item['serial_status'] = bs.find('table').find('tr').find_all('td')[-1].get_text().replace('\xa0', '')
         item['serial_length'] = bs.find('table').find_all('tr')[1].find_all('td')[1].get_text().replace('\xa0', '')
-        yield item
+        bash_url = bs.find('p', class_='btnlinks').find('a', class_='read')['href']
+        ret = Sql.select_name(item['novel_id'])
+        if ret == 1:
+            print("该小说已存在")
+        else:
+            yield item
+        yield Request(bash_url, callback=self.get_chapter, meta={'novel_id': item['novel_id']})
 
+    def get_chapter(self, response):
+        pattern = r'<td class="L"><a href="(.*?)">(.*?)</a></td>'
+        urls = re.findall(pattern, response.text)
+        num = 0
+        for url in urls:
+            num += 1
+            chapter_url = response.url + url[0]
+            chapter_name = url[1]
+            ret = Sql.select_chapter(chapter_url)
+            if ret == 1:
+                print("章节已经存在了")
+            else:
+                yield Request(chapter_url, callback=self.get_chater_content, meta={
+                    'num': num,
+                    'novel_id': response.meta['novel_id'],
+                    'chapter_name': chapter_name,
+                    'chapter_url': chapter_url
+                })
+
+    def get_chater_content(self, response):
+        item = ContentItem()
+        item['num'] = response.meta['num']
+        item['novel_id'] = response.meta['novel_id']
+        item['chater_name'] = response.meta['chapter_name']
+        item['chapter_url'] = response.meta['chapter_url']
+        content = BeautifulSoup(response.text, 'lxml').find('dd', id='contents').get_text().replace('\xa0', '')
+        item['chapter_content'] = content
+        yield item
         
         
     
