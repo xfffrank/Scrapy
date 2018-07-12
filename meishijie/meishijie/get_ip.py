@@ -17,9 +17,12 @@ class GetIp(object):
     def get_proxy_ip(self):
         start = time.time()
         print('start crawling ip...')
-        html = requests.get('http://www.xicidaili.com/', headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36'
-        })
+        try:
+            html = requests.get('http://www.xicidaili.com/', headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36'
+            })
+        except Exception as e:
+            print(e)
         soup = BeautifulSoup(html.text, 'lxml')
         trs = soup.find('table', id='ip_list').find_all('tr', class_=['', 'odd'])[2:]
         for tr in trs:

@@ -65,9 +65,10 @@ DOWNLOAD_TIMEOUT = 3  # 设置连接超时时间
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+ITEM_PIPELINES = {
+    'meishijie.mysql_pipelines.pipelines.MeishijiePipeline': 300
 #    'meishijie.pipelines.MeishijiePipeline': 300,
-#}
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -89,3 +90,10 @@ DOWNLOAD_TIMEOUT = 3  # 设置连接超时时间
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# mysql 配置
+MYSQL_HOSTS = 'localhost'
+MYSQL_USER = 'abc'
+MYSQL_PASSWORD = '123'
+MYSQL_PORT = '3306'
+MYSQL_DB = 'food'

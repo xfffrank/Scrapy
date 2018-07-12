@@ -6,6 +6,7 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import logging
 
 
 class MeishijieSpiderMiddleware(object):
@@ -90,7 +91,7 @@ class MeishijieDownloaderMiddleware(object):
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        print('当前代理为 ', self.proxy)
+        # print('当前代理为 ', self.proxy)
         request.meta['proxy'] = self.proxy
         # return None
 
@@ -101,11 +102,12 @@ class MeishijieDownloaderMiddleware(object):
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
-        if response.status != 200:
-            self.proxy = self.get_random_ip()
-            print('更换ip')
-            request.meta['proxy'] = self.proxy
-            return request
+
+        # if response.status != 200:
+        #     self.proxy = self.get_random_ip()
+        #     print('更换ip')
+        #     request.meta['proxy'] = self.proxy
+        #     return request
         return response
 
     def process_exception(self, request, exception, spider):
@@ -116,7 +118,12 @@ class MeishijieDownloaderMiddleware(object):
         # - return None: continue processing this exception
         # - return a Response object: stops process_exception() chain
         # - return a Request object: stops process_exception() chain
-        pass
+        self.proxy = self.get_random_ip()
+        spider.logger.info('---更换 ip---')
+        print('更换 ip 为：', self.proxy)
+        request.meta['proxy'] = self.proxy
+        return request
+        # pass
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
